@@ -2,13 +2,12 @@ import pygame
 import sys
 import random
 import os
-import json
 
 pygame.init()
 
 # Janela
 largura, altura = 800, 400
-tela = pygame.display.set_mode((largura, altura))
+tela = pygame.display.set_mode((largura, altura), pygame.SCALED)
 pygame.display.set_caption("Jogo do Dinossauro")
 
 # FPS
@@ -25,24 +24,8 @@ fonte = pygame.font.SysFont(None, 36)
 # Caminho das imagens
 pasta_img = os.path.join(os.path.dirname(__file__), "img")
 
-# Recorde com JSON
-ARQUIVO_RECORDE = os.path.join(os.path.dirname(__file__), "recorde.json")
-
-def carregar_recorde():
-    if os.path.exists(ARQUIVO_RECORDE):
-        with open(ARQUIVO_RECORDE, "r") as f:
-            try:
-                dados = json.load(f)
-                return dados.get("recorde", 0)
-            except:
-                return 0
-    return 0
-
-def salvar_recorde(pontos):
-    with open(ARQUIVO_RECORDE, "w") as f:
-        json.dump({"recorde": pontos}, f)
-
-recorde = carregar_recorde()
+# Recorde em memória (não salva no navegador)
+recorde = 0
 
 # Animações do dinossauro
 walk = [pygame.image.load(os.path.join(pasta_img, "walk", f"walk{i}.png")) for i in range(1, 11)]
@@ -55,7 +38,6 @@ cacto_imgs = [
     pygame.transform.scale(pygame.image.load(os.path.join(pasta_img, "cacto2.png")), (30, 50))
 ]
 
-# Função para resetar o jogo
 def resetar():
     global velocidade_obstaculos
     velocidade_obstaculos = 8
@@ -69,7 +51,6 @@ def resetar():
         "obstaculos": gerar_obstaculos()
     }
 
-# Função para gerar obstáculos
 def gerar_obstaculos():
     obstaculos = []
     for i in range(3):
@@ -79,16 +60,13 @@ def gerar_obstaculos():
         obstaculos.append({"img": img, "x": x, "y": y})
     return obstaculos
 
-# Inicialização
 estado = resetar()
 gravidade = 1
 dino_x = 50
 
-# Controle da animação
 frame_index = 0
 frame_count = 0
 frame_delay = 5
-
 velocidade_obstaculos = 8
 
 while True:
@@ -116,7 +94,7 @@ while True:
     if not estado["game_over"]:
         estado["vel_y"] += gravidade
         estado["dino_y"] += estado["vel_y"]
-    #simulando pulo
+
         if estado["dino_y"] >= chao_y:
             estado["dino_y"] = chao_y
             estado["vel_y"] = 0
@@ -168,7 +146,6 @@ while True:
 
     if estado["pontos"] > recorde:
         recorde = estado["pontos"]
-        salvar_recorde(recorde)
 
     if estado["game_over"]:
         msg = fonte.render("Game Over! Pressione R para reiniciar", True, VERMELHO)
