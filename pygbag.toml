@@ -1,3 +1,7 @@
 [project]
-name = "scripts"
+name = "jogo_dino"
 entrypoint = "main.py"
+
+[[project.files]]
+include = ["img/**/*"]
+
